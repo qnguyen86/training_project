@@ -1,5 +1,6 @@
 <?php
-class AdminModel
+require ('models/BaseModel.php');
+class AdminModel extends BaseModel
 {
     public $id;
     public $email;
@@ -37,16 +38,29 @@ class AdminModel
             header("location:index.php?controller=admin&action=index");
         }
     }
-    public function createAccount()
+    public function create()
     {
-
+        $name=$_POST['name'];
+        $email=$_POST['email'];
+        $password=$_POST['password'];
+        $avatar=$_POST['avatar'];
         $db = DB::getInstance();
-
-        $req = $db->prepare("insert into admin set name=:var_name, email=:var_email, password=:var_password, avatar=:var_avatar");
+        $req = $db->prepare("INSERT INTO admin set name=:var_name, email=:var_email, password=:var_password, avatar=:var_avatar");
         $req->execute(array("var_name"=>$name,"var_email"=>$email,"var_password"=>$password,"var_avatar"=>$avatar));
-
+        if(mysqli_fetch_row($req))
+        {
+            return $req;
+        }
     }
 
+    public function update()
+    {
+        // TODO: Implement update() method.
+    }
+    public function delete()
+    {
+        // TODO: Implement delete() method.
+    }
 
 
 }
