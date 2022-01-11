@@ -1,7 +1,7 @@
 <?php
 $controllers = array(
     'pages' => ['home', 'error'],
-    'admin'=>['home','error','index','login','logout','create']
+    'admin'=>['home','error','index','login','logout','create','edit']
 ); // Các controllers trong hệ thống và các action có thể gọi ra từ controller đó.
 
 if (!array_key_exists($controller, $controllers) || !in_array($action, $controllers[$controller])) {
