@@ -4,6 +4,39 @@
 <div class="col-md-12">
     <div class="panel panel-primary">
         <div class="panel-heading"><b>Danh sách quản trị viên</b></div>
+
+
+           <div class="message">
+               <?php if (isset($_SESSION['error'])): ?>
+                   <div class="alert alert-danger">
+                       <?php
+                       echo $_SESSION['error'];
+                       unset($_SESSION['error']);
+                       ?>
+                   </div>
+               <?php endif; ?>
+
+               <?php if (!empty($this->error)): ?>
+                   <div class="alert alert-danger">
+                       <?php
+                       echo $this->error;
+                       ?>
+                   </div>
+               <?php endif; ?>
+
+               <?php if (isset($_SESSION['success'])): ?>
+                   <div class="alert alert-success">
+                       <?php
+                       echo $_SESSION['success'];
+                       unset($_SESSION['success']);
+                       ?>
+                   </div>
+               <?php endif; ?>
+           </div>
+    </div>
+            <!--        <div class="alert alert-danger">Lỗi validate</div>-->
+            <!--        <p class="alert alert-success">Thành công</p>-->
+
         <div class="panel-body">
             <table class="table table-bordered table-hover">
                 <tr>
