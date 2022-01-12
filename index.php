@@ -1,19 +1,15 @@
 <?php 
     session_start();
-    //load file Connection.php
     require_once"Connection.php";
-    //load file Controller.php
     require_once"controllers/BaseController.php";
  ?>
- <?php  
-    //lay bien controller truyen tu url
+ <?php
     $controller = isset($_GET["controller"])?$_GET["controller"]:"Home";
     $action = isset($_GET["action"])?$_GET["action"]:"index";
-    //tao duong dan vat ly cua file controller trong MVC
-    $controllerFile = "controllers/Controller".$controller.".php";
+    $controllerFile = "controllers/".ucfirst($controller)."Controller.php";
     if(file_exists($controllerFile)){
         include $controllerFile;
-        $controllerClass = "Controller".$controller;
+        $controllerClass = $controller."Controller";
         //khoi tao object cua class
         $obj = new $controllerClass();
         //goi den action
