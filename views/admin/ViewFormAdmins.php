@@ -64,8 +64,10 @@
                 <div class="col-md-2"></div>
                 <div class="col-md-10">
                     <input type="submit" value="Process" class="btn btn-primary">
+                    <input type="reset" value="Reset" class="btn btn-primary">
                 </div>
             </div>
+
             <!-- end rows -->
         </form>
         </div>
