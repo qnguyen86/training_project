@@ -12,7 +12,9 @@
 			$data = $this->modelRead($recordPerPage);
 			$this->loadView("ViewAdmins.php",array("data"=>$data,"numPage"=>$numPage));
 		}
-
+        public function detail(){
+            $record = $this->modelGetRecord();
+        }
 		public function create(){
 
 			$action = "index.php?controller=admin&action=createPost";
@@ -38,5 +40,24 @@
             $this->modelDelete();
             header("location:index.php?controller=admin");
         }
+        public function ajaxSearch(){
+            $data = $this->modelAjaxSearch();
+            $strResult = "";
+            echo "<ul>";
+            foreach($data as $item){
+                $strResult = $strResult."<li><img src='assets/upload/news/{$item->avatar}'>
+               <a href='index.php?controller=admin&action=detail&id={$item->id}'>{$item->name}</a>
+               <a href='index.php?controller=admin&action=detail&id={$item->id}'>{$item->email}</a>
+               <a href='index.php?controller=admin&action=detail&id={$item->id}'>{$item->role_type}</a></li>";
+
+            }
+            echo $strResult;
+            echo "</ul>";
+        }
+
+        public function search(){
+            $this->loadView("ViewSearch.php");
+        }
+
 	}
  ?>
