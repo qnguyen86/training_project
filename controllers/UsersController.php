@@ -38,5 +38,8 @@
             $this->modelDelete();
             header("location:index.php?controller=users");
         }
+       public function search(){
+            $this->loadView('ViewSearchUser.php');
+       }
     }
  ?>
