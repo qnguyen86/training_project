@@ -17,4 +17,5 @@
                 header('Location: index.php?controller=pages&action=error');
             }
         }
+
     }
