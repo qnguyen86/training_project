@@ -4,30 +4,18 @@ class ValidationComponent
 {
     public function validateLoginAdmin($data){
         $validate[]=[
-            'status'=>false,
-            'errors'=>[]
         ];
         //validate email
-        if(empty($data['email'])){
-            $validate['errors']['email'] = 'Please enter email';
-        }else{
-            if($this->AdminModel->findAdminByEmail($data['email'])){
-                //admin found
-            }else{
-                $validate['errors']['email'] = 'Admin not found';
+            if (empty($data['email'])) {
+                $data['email_err'] = 'Please enter email';
             }
-        }
 
-        //validate password
-        if(empty($data['password'])){
-            $validate['errors']['password'] = 'Please enter your password';
-        }elseif(strlen($data['password']) < 6){
-            $validate['errors']['password'] = 'Password must be at least six characters';
-        }
-
-        if (empty($validate['errors'])) {
-            $validate['status'] = true;
-        }
+            //validate password
+            if (empty($data['password'])) {
+                $data['password_err'] = 'Please enter your password';
+            } elseif (strlen($data['password']) < 6) {
+                $data['password_err'] = 'Password must be at least six characters';
+            }
         return $validate;
 
     }
