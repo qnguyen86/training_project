@@ -1,13 +1,18 @@
 <?php
 require_once('controllers/BaseController.php');
-require_once('controllers/AdminController.php');
-require_once('component/ValidationComponent.php');
+require_once('models/AdminModel.php');
+include_once('component/ValidationComponent.php');
+include_once('component/Message.php');
 
 class AdminController extends BaseController
 {
+    public $adminModel;
+
     public function __construct()
     {
         $this->folder = 'admin';
+        $this->adminModel = new AdminModel();
+
     }
 
     public function error()
@@ -24,38 +29,33 @@ class AdminController extends BaseController
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             // process form
-
+            session_start();
             $data = [
                 'email' => $_POST['email'],
                 'password' => $_POST['password'],
                 'email_err' => '',
                 'password_err' => ''
             ];
-
             //validate
-            //validate email
-            if (empty($data['email'])) {
-                $data['email_err'] = 'Please enter email';
+            if (empty($_POST['email'])) {
+                $data['email_err'] = ERROR_EMAIl;
             }
-
-            //validate password
-            if (empty($data['password'])) {
-                $data['password_err'] = 'Please enter your password';
-            } elseif (strlen($data['password']) < 6) {
-                $data['password_err'] = 'Password must be at least six characters';
+            if (empty($_POST['password'])) {
+                $data['password_err'] = ERROR_PASSWORD_ONE;
+            } elseif (strlen($_POST['password']) < 6) {
+                $data['password_err'] = ERROR_PASSWORD_TWO;
             }
-
-
             //check all error are empty
             if (empty($data['email_err']) && empty($data['password_err'])) {
-                $loginIn = AdminModel::login($data['email'], $data['password']);
+                $loggedInUser = AdminModel::login($_POST['email'], $_POST['password']);
 
             } else {
                 $this->render('login', $data);
             }
 
         } else {
-            //init data f f
+
+            // init data
             $data = [
                 'email' => '',
                 'password' => '',
@@ -74,62 +74,46 @@ class AdminController extends BaseController
 
     public function create()
     {
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $ins_id ='';
-            $upd_id='';
-            $data = [
-                'name' => $_POST['title'],
-                'email' => $_POST['email'],
-                'password' => $_POST['password'],
-                'password_verify' => $_POST['password_verify'],
-                'ins_id' => $ins_id,
-                'upd_id' => $upd_id ,
-                'avatar' => "",
-                'name_err' => '',
-                'email_err' => '',
-                'password_err' => '',
-                'password_verify_err' => '',
-            ];
-            if ($_FILES["avatar"]["name"] != "") {
-                $avatar = time() . "_" . $_FILES["avatar"]["name"];
-                move_uploaded_file($_FILES["avatar"]["tmp_name"], "assets/upload/news/$avatar");
+        $data = [];
+        if (isset($_POST['save'])) {
+            if (empty($_POST['name'])) {
+                $data['name_err'] = ERROR_NAME;
+            }
+            if (empty($_POST['email'])) {
+                $data['email_err'] = ERROR_EMAIl;
+            }
+            if (empty($_POST['password'])) {
+                $data['password_err'] = ERROR_PASSWORD_ONE;
             }
 
-            if (empty($data['name'])) {
-                $data['name_err'] = 'Please enter name';
+            if (empty($_FILES["avatar"]["name"])) {
+                $data['avatar_err'] = ERROR_AVATAR;
             }
-            if (empty($data['email'])) {
-                $data['email_err'] = 'Please enter email';
-            }
-            if (empty($data['password'])) {
-                $data['password_err'] = 'Please enter password';
-            }
-            if ($data['password'] != $data['password_verify']) {
-                $data['password_verify_err'] = 'Password is not correct';
+            empty($_POST["role_type"]) ;
+
+            if (empty($data)) {
+                $uploadFile = 'assets/upload/admin/'.$_FILES["avatar"]["name"];
+                $arr = array(
+                    'avatar' => $_FILES["avatar"]["name"],
+                    'name' => $_POST['name'],
+                    'email' => $_POST['email'],
+                    'password' => $_POST['password'],
+                    'role_type' => $_POST['role_type'],
+                );
+
+                if ($this->adminModel->insert($arr)) {
+                    move_uploaded_file($_FILES["avatar"]["tmp_name"], $uploadFile);
+                    $_SESSION['admin']['upload'] = $uploadFile;
+                    $data['alert-success'] = INSERT_PASS;
+                }
+            }else{
+                $data['alert-fail'] = INSERT_FAIL;
             }
 
-            //check all error
-            if (empty($data['name_err']) && empty($data['email_err']) && empty($data['password_err']) && empty($data['password_verify_err']) ) {
-               $add= AdminModel::insert($data);
-
-                //load view with error
-            } else {
-                $this->render('create', $data);
-            }
-        } else {
-            $data = [
-                'avatar' => (isset($_POST['avatar']) ? $_POST['avatar'] : ''),
-                'name' => (isset($_POST['name']) ? $_POST['name'] : ''),
-                'email' => (isset($_POST['email']) ? $_POST['email'] : ''),
-                'password' => (isset($_POST['password']) ? $_POST['password'] : ''),
-                'password_verify' => (isset($_POST['password_verify']) ? $_POST['password_verify'] : ''),
-            ];
-
-            $this->render('create', $data);
         }
 
+        $this->render('create', $data);
 
     }
-
 
 }
