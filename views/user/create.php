@@ -9,7 +9,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="card-body">
                 <form method="post" action="index.php?controller=user&action=create" enctype="multipart/form-data">
                     <?php if (isset($data['alert-success'])) echo "<h4 class='alert-success bg-green'>{$data['alert-success']}</h4>"; ?>
@@ -18,9 +17,7 @@
                         <label for="title">Avatar<sub>*</sub></label>
                         <input type="file" name="avatar" class="form-control form-control-lg"
                                value="<?php if (isset($_FILES['avatar']['name'])) echo $_FILES['avatar']['name']; ?>">
-
                     </div>
-
                     <div class="form-group">
                         <label for="password">Name<sub>*</sub></label>
                         <textarea type="text" name="name"
@@ -28,7 +25,6 @@
                                   value="<?php if (!isset($_POST['name'])) echo $_POST['name']; ?>">
                         </textarea>
                         <span class="invalid-feedback"><?php echo $data['name_err']; ?> </span>
-
                     </div>
                     <div class="form-group">
                         <label for="password">Email<sub>*</sub></label>
@@ -52,8 +48,7 @@
                         <span class="invalid-feedback"> </span>
                     </div>
                     <input type="radio" class="form-check-input" name="status"
-                           value="2" <?php if (isset($_POST['status']) && $_POST['status'] == 2) echo "checked"; else echo ""; ?>>Banned
-                     &nbsp; &nbsp; &nbsp;
+                           value="2" <?php if (isset($_POST['status']) && $_POST['status'] == 2) echo "checked"; else echo ""; ?>>Banned&nbsp; &nbsp; &nbsp;
                     <input type="radio" class="form-check-input" name="status"
                            value="1" <?php if (isset($_POST['status']) && $_POST['status'] == 1) echo "checked";
                     if (empty($_POST['status'])) echo "checked"; ?>>Active
