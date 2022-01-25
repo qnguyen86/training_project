@@ -9,51 +9,57 @@
                     </div>
                 </div>
             </div>
-
             <div class="card-body">
-                <form method="post" action="index.php?controller=admin&action=create">
+                <form method="post" action="index.php?controller=admin&action=create" enctype="multipart/form-data">
+                    <?php if (isset($data['alert-success'])) echo "<h4 class='alert-success bg-green'>{$data['alert-success']}</h4>"; ?>
+                    <?php if (isset($data['alert-fail'])) echo "<h4 class='alert-warning '>{$data['alert-fail']}</h4>"; ?>
+
                     <div class="form-group">
                         <label for="title">Avatar<sub>*</sub></label>
-                        <input type="file" name="avatar" class="form-control form-control-lg ">
 
+                        <input type="file" name="avatar" class="form-control form-control-lg"
+                               value="<?php if (isset($_FILES['avatar']['name'])) echo $_FILES['avatar']['name']; ?>">
                     </div>
-                    <?php if (isset($record->avatar) && file_exists("assets/upload/news/" . $record->avatar)): ?>
-                        <div class="form-group">
-                            <label for="title">Avatar<sub>*</sub></label>
-                            <img src="assets/upload/news/<?php echo $record->avatar; ?>" style="width: 100px;" alt=""
-                                 srcset="">
-                        </div>
-                    <?php endif; ?>
                     <div class="form-group">
                         <label for="password">Name<sub>*</sub></label>
-                        <text type="text" name="name" class="form-control form-control-lg ">
-                        </text>
-                        <span class="invalid-feedback"> </span>
+                        <textarea type="text" name="name"
+                                  class="form-control form-control-lg <?php echo (!empty($data['name_err'])) ? 'is-invalid' : ''; ?>"
+                                  value="<?php if (!isset($_POST['name'])) echo $_POST['name']; ?>">
+                        </textarea>
+                        <span class="invalid-feedback"><?php echo $data['name_err']; ?> </span>
                     </div>
                     <div class="form-group">
                         <label for="password">Email<sub>*</sub></label>
-                        <text type="text" name="email" class="form-control form-control-lg ">
-                        </text>
-                        <span class="invalid-feedback"> </span>
+                        <textarea type="text" name="email"
+                                  class="form-control form-control-lg <?php echo (!empty($data['email_err'])) ? 'is-invalid' : ''; ?>"
+                                  value="<?php if (isset($_POST['email'])) echo $_POST['email']; ?>">
+                        </textarea>
+                        <span class="invalid-feedback"><?php echo $data['email_err']; ?>  </span>
                     </div>
                     <div class="form-group">
                         <label for="password">Password<sub>*</sub></label>
-                        <text type="text" name="password" class="form-control form-control-lg ">
-                        </text>
-                        <span class="invalid-feedback"> </span>
+                        <textarea type="text" name="password"
+                                  class="form-control form-control-lg <?php echo (!empty($data['password_err'])) ? 'is-invalid' : ''; ?>">
+                        </textarea>
+                        <span class="invalid-feedback"> <?php echo $data['password_err']; ?> </span>
                     </div>
                     <div class="form-group">
                         <label for="password">Password Verify<sub>*</sub></label>
-                        <text type="text" name="password_verify" class="form-control form-control-lg ">
-                        </text>
+                        <textarea type="text" name="password_verify" class="form-control form-control-lg ">
+                        </textarea>
                         <span class="invalid-feedback"> </span>
                     </div>
-
-
+                    <input type="radio" class="form-check-input" name="role_type"
+                           value="1" <?php if (isset($_POST['role_type']) && $_POST['role_type'] == 1) echo "checked"; else echo ""; ?>>Super
+                    Admin &nbsp; &nbsp; &nbsp;
+                    <input type="radio" class="form-check-input" name="role_type"
+                           value="2" <?php if (isset($_POST['role_type']) && $_POST['role_type'] == 2) echo "checked";
+                    if (empty($_POST['role_type'])) echo "checked"; ?>>Admin
                     <div class="form-group">
                         <div class="row">
                             <div class="col">
-                                <input type="submit" class="btn btn-primary btn-block pull-left" value="Save">
+                                <input type="submit" class="btn btn-primary btn-block pull-left" name="save"
+                                       value="Save">
                             </div>
                             <div class="col">
                                 <input type="reset" class="btn btn-primary btn-block pull-right" value="Reset">
