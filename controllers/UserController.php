@@ -22,9 +22,10 @@ class UserController extends BaseController
 
     public function index()
     {
-
-
-        $this->render('index');
+        $recordPerPage = 2;
+        $numPage = ceil($this->userModel->modelTotalRecord() / $recordPerPage);
+        $data = $this->userModel->modelRead($recordPerPage);
+        $this->render('index', array("data" => $data, "numPage" => $numPage));
     }
 
 
@@ -71,6 +72,54 @@ class UserController extends BaseController
 
         $this->render('create', $data);
 
+    }
+    function update()
+    {
+        $id = $_GET['id'];
+        $data = $this->userModel->modelGetID($id);
+        $err = [];
+        if (isset($_POST['save'])) {
+            if (empty($_POST['name'])) {
+                $err['name_err'] = ERROR_NAME;
+            }
+            $name = !empty($err['name_err']) ? $data['name'] : $_POST['name'];
+            if (empty($_POST['email'])) {
+                $err['email_err'] = ERROR_EMAIl;
+            }
+            $email = !empty($err['email_err']) ? $data['email'] : $_POST['email'];
+            if (empty($_POST['password'])) {
+                $err['password_err'] = ERROR_PASSWORD_ONE;
+            }
+            $password = !empty($err['password_err']) ? $data['password'] : $_POST['password'];
+            $avatar = $_FILES['avatar']['name'];
+            $status = $_POST['status'];
+            $arr = array(
+                'avatar' => $avatar,
+                'name' => $name,
+                'email' => $email,
+                'password' => $password,
+                'status' => $status,
+            );
+            $upload_file = 'assets/upload/user/' . $_FILES['avatar']['name'];
+            if ($this->userModel->update($arr, "`id` = '{$id}'")) {
+                move_uploaded_file($_FILES['avatar']['tmp_name'], $upload_file);
+                $data['alert-success'] = UPDATE_PASS;
+            }
+        }
+        $mag = array(
+            'error' => $err,
+            'data' => $data,
+        );
+        $this->render('update', $mag);
+    }
+    function delete(){
+        $id = $_GET['id'];
+        if ($this->userModel->delete("`id`={$id}")) {
+            header("Location: index.php?controller=user&action=index");
+        }
+    }
+    function search(){
+        $this->render('search');
     }
 
 }
