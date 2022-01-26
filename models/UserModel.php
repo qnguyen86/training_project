@@ -16,7 +16,7 @@ class UserModel extends BaseModel
         $page = isset($_GET["page"]) && $_GET["page"] > 0 ? $_GET["page"] - 1 : 0;
         $from = $page * $recordPerPage;
         $conn = DB::getInstance();
-        $query = $conn->query("select * from users order by id desc limit $from, $recordPerPage");
+        $query = $conn->query("select * from users where del_flag='0' order by id desc limit $from, $recordPerPage");
         return $query->fetchAll();
     }
 
