@@ -31,6 +31,17 @@ class UserModel extends BaseModel
         return $this->db->query("SELECT * FROM `{$this->tableName}` WHERE `id` = '{$id}' ")->fetch();
 
     }
+    public function login($email, $password)
+    {
+        $conn = DB::getInstance();
+        $query = $conn->prepare("select email from users where email= :var_email and password = :var_password");
+        $query->execute(array("var_email" => $email, "var_password" => $password));
+        if ($query->rowCount() > 0) {
+            $_SESSION["email"] = $email;
+            header("location:index.php?controller=user&action=index");
+        } else
+            header("location:index.php?controller=user&action=login");
+    }
 
 
 
