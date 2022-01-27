@@ -23,9 +23,10 @@ class UserController extends BaseController
     public function index()
     {
         $recordPerPage = 2;
+        $page = isset($_GET["page"]) && $_GET["page"]  ? 1 : '';
         $numPage = ceil($this->userModel->modelTotalRecord() / $recordPerPage);
         $data = $this->userModel->modelRead($recordPerPage);
-        $this->render('index', array("data" => $data, "numPage" => $numPage));
+        $this->render('index', array("data" => $data, "numPage" => $numPage,"page"=>$page));
     }
 
 
@@ -120,6 +121,46 @@ class UserController extends BaseController
     }
     function search(){
         $this->render('search');
+    }
+    public function login()
+    {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            // process form
+            session_start();
+            $data = [
+                'email' => $_POST['email'],
+                'password' => $_POST['password'],
+                'email_err' => '',
+                'password_err' => ''
+            ];
+            //validate
+            if (empty($_POST['email'])) {
+                $data['email_err'] = ERROR_EMAIl;
+            }
+            if (empty($_POST['password'])) {
+                $data['password_err'] = ERROR_PASSWORD_ONE;
+            } elseif (strlen($_POST['password']) < 6) {
+                $data['password_err'] = ERROR_PASSWORD_TWO;
+            }
+            //check all error are empty
+            if (empty($data['email_err']) && empty($data['password_err'])) {
+                $loggedInUser = UserModel::login($_POST['email'], $_POST['password']);
+
+            } else {
+                $this->render('login', $data);
+            }
+
+        } else {
+
+            // init data
+            $data = [
+                'email' => '',
+                'password' => '',
+
+            ];
+            //load view
+            $this->render('login', $data);
+        }
     }
 
 }
