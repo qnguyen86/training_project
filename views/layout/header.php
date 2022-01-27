@@ -10,12 +10,18 @@
     <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" />
     <link rel="stylesheet" href="assets/css/bootstrap.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" />
 </head>
 <body>
 <div class="navbar1">
-    <a href="index.php">Home</a>
+
     <div class="dropdown1">
-        <button class="dropbtn1"><a href="index.php?controller=admin">Admin management</a>
+        <button class="dropbtn1"><a href="index.php?controller=admin&action=logout">Logout</a></button>
+    </div>
+    <div class="dropdown1">
+        <button class="dropbtn1"><a href="index.php?controller=admin&action=index">Admin management</a>
             <i class="fa fa-caret-down"></i>
         </button>
         <div class="dropdown-content1">
@@ -23,17 +29,20 @@
             <a href="index.php?controller=admin&action=create">Create</a>
         </div>
     </div>
-    <a href="index.php?controller=admin&action=logout">Logout</a>
+
     <div class="dropdown1">
-        <button class="dropbtn1"><a href="index.php?controller=users">User management</a>
+        <button class="dropbtn1"><a href="index.php?controller=user&action=login">User management</a>
             <i class="fa fa-caret-down"></i>
         </button>
         <div class="dropdown-content1">
-            <a href="index.php?controller=users&action=search">Search</a>
-            <a href="index.php?controller=users&action=create">Create</a>
-
+            <a href="index.php?controller=user&action=search">Search</a>
+            <a href="index.php?controller=user&action=create">Create</a>
         </div>
     </div>
+    <div class="dropdown1">
+        <button class="dropbtn1"><a href="index.php">Home</a></button>
+    </div>
+
 </div>
 </div>
 
