@@ -22,10 +22,11 @@ class AdminController extends BaseController
 
     public function index()
     {
-        $recordPerPage = 2;
+        $recordPerPage = 3;
+        $page = isset($_GET["page"]) && $_GET["page"]  ? 1 : '';
         $numPage = ceil($this->adminModel->modelTotalRecord() / $recordPerPage);
-        $data = $this->adminModel->modelRead($recordPerPage);
-        $this->render('index', array("data" => $data, "numPage" => $numPage));
+        $data = $this->adminModel->modelRead($recordPerPage,$page);
+        $this->render('index', array("data" => $data,"numPage" => $numPage,"page"=>$page));
     }
 
     public function login()
