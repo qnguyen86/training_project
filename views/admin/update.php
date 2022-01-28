@@ -48,7 +48,7 @@
                 <div class="row" style="margin-top:5px;">
                     <div class="col-md-2">Password_Verify</div>
                     <div class="col-md-10">
-                        <input type="text" value="" name="password" class="form-control" required>
+                        <input type="text" value="" name="password_vetify" class="form-control" required>
                     </div>
                 </div>
                 <!-- end rows -->
