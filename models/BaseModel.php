@@ -13,7 +13,6 @@ abstract class BaseModel implements DBInterface
     {
         $ins = ['ins_id' => 0, 'ins_datetime' => date("y-m-d H:i:s "),];
         $data = array_merge($data, $ins);
-
         $fields = "";
         $values = "";
         foreach ($data as $key => $value) {
@@ -44,10 +43,22 @@ abstract class BaseModel implements DBInterface
 
     public function delete($condition = "")
     {
-        
-        $sql = "DELETE FROM {$this->tableName} WHERE $condition";
+        $sql = "UPDATE {$this->tableName} SET `del_flag` = '" . '1' . "' WHERE $condition";
         $query = $this->db->query($sql);
         return $query ? true : false;
     }
+    function is_email($email) {
+        return (preg_match("/^([a-z0-9\+_\-]+)(\.[a-z0-9\+_\-]+)*@([a-z0-9\-]+\.)+[a-z]{2,6}$/ix", $email)) ? FALSE : TRUE;
+    }
+    public function findEmail($email)
+    {
+        if (!empty($email))
+            return $this->db->query("SELECT `email` FROM `{$this->tableName}` WHERE `email` LIKE '{$email}' AND `del_flag` = '0'")->rowCount();
+    }
+    function is_name($name) {
+        return (preg_match("/^[a-zA-z]*$/", $name)) ? FALSE : TRUE;
+    }
+
+
 
 }
