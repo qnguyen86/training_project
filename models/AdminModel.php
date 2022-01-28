@@ -11,6 +11,7 @@ class AdminModel extends BaseModel
         $this->db = DB::getInstance();
         $this->tableName = "admin";
     }
+
     public function modelRead($recordPerPage)
     {
         $page = isset($_GET["page"]) && $_GET["page"] > 0 ? $_GET["page"] - 1 : 0;
@@ -23,9 +24,10 @@ class AdminModel extends BaseModel
     public function modelTotalRecord()
     {
         $conn = DB::getInstance();
-        $query = $conn->query("select id from admin");
+        $query = $conn->query("select id from admin where del_flag='0'");
         return $query->rowCount();
     }
+
     public function modelGetID($id)
     {
         //return $this->db->query("SELECT * FROM `{$this->tableName}` WHERE `id` = '{$id}' ")->fetch();
@@ -45,6 +47,7 @@ class AdminModel extends BaseModel
         } else
             header("location:index.php?controller=admin&action=login");
     }
+
 
 
 
