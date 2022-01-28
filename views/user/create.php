@@ -43,9 +43,9 @@
                     </div>
                     <div class="form-group">
                         <label for="password">Password Verify<sub>*</sub></label>
-                        <textarea type="text" name="password_verify" class="form-control form-control-lg ">
+                        <textarea type="text" name="password_vetify" class="form-control form-control-lg <?php echo (!empty($data['password_err'])) ? 'is-invalid' : ''; ?>">
                         </textarea>
-                        <span class="invalid-feedback"> </span>
+                        <span class="invalid-feedback"> <?php echo $data['password_err']; ?></span>
                     </div>
                     <input type="radio" class="form-check-input" name="status"
                            value="2" <?php if (isset($_POST['status']) && $_POST['status'] == 2) echo "checked"; else echo ""; ?>>Banned&nbsp; &nbsp; &nbsp;
