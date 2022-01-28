@@ -8,11 +8,11 @@ class AdminController extends BaseController
 {
     public $adminModel;
 
+
     public function __construct()
     {
         $this->folder = 'admin';
         $this->adminModel = new AdminModel();
-
     }
 
     public function error()
@@ -23,10 +23,9 @@ class AdminController extends BaseController
     public function index()
     {
         $recordPerPage = 3;
-        $page = isset($_GET["page"]) && $_GET["page"]  ? 1 : '';
         $numPage = ceil($this->adminModel->modelTotalRecord() / $recordPerPage);
-        $data = $this->adminModel->modelRead($recordPerPage,$page);
-        $this->render('index', array("data" => $data,"numPage" => $numPage,"page"=>$page));
+        $data = $this->adminModel->modelRead($recordPerPage);
+        $this->render('index', array("data" => $data,"numPage" => $numPage));
     }
 
     public function login()
@@ -44,11 +43,15 @@ class AdminController extends BaseController
             if (empty($_POST['email'])) {
                 $data['email_err'] = ERROR_EMAIl;
             }
+            else if ($this->adminModel->is_email($_POST['email'])){
+                $data['email_err'] = ERROR_INVALID_EMAIl;
+            }
             if (empty($_POST['password'])) {
                 $data['password_err'] = ERROR_PASSWORD_ONE;
             } elseif (strlen($_POST['password']) < 6) {
                 $data['password_err'] = ERROR_PASSWORD_TWO;
             }
+
             //check all error are empty
             if (empty($data['email_err']) && empty($data['password_err'])) {
                 $loggedInUser = AdminModel::login($_POST['email'], $_POST['password']);
@@ -83,11 +86,21 @@ class AdminController extends BaseController
             if (empty($_POST['name'])) {
                 $data['name_err'] = ERROR_NAME;
             }
+            else if ($this->adminModel->is_name($_POST['name'])){
+                $data['name_err'] = ERROR_INVALID_NAME;
+            }
             if (empty($_POST['email'])) {
                 $data['email_err'] = ERROR_EMAIl;
             }
+            else if ($this->adminModel->findEmail($_POST['email'])){
+                $data['email_err'] = ERROR_NOT_EMAIl;
+            }
             if (empty($_POST['password'])) {
                 $data['password_err'] = ERROR_PASSWORD_ONE;
+            }
+            if ($_POST['password'] != $_POST['password_vetify'] )
+            {
+                $data['password_err']=CONFIRM_PASSWORD;
             }
 
             if (empty($_FILES["avatar"]["name"])) {
