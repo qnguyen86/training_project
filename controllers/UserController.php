@@ -23,10 +23,10 @@ class UserController extends BaseController
     public function index()
     {
         $recordPerPage = 2;
-        $page = isset($_GET["page"]) && $_GET["page"]  ? 1 : '';
+
         $numPage = ceil($this->userModel->modelTotalRecord() / $recordPerPage);
         $data = $this->userModel->modelRead($recordPerPage);
-        $this->render('index', array("data" => $data, "numPage" => $numPage,"page"=>$page));
+        $this->render('index', array("data" => $data, "numPage" => $numPage));
     }
 
 
@@ -38,11 +38,18 @@ class UserController extends BaseController
             if (empty($_POST['name'])) {
                 $data['name_err'] = ERROR_NAME;
             }
+            else if ($this->adminModel->is_name($_POST['name'])){
+                $data['name_err'] = ERROR_INVALID_NAME;
+            }
             if (empty($_POST['email'])) {
                 $data['email_err'] = ERROR_EMAIl;
             }
             if (empty($_POST['password'])) {
                 $data['password_err'] = ERROR_PASSWORD_ONE;
+            }
+            if ($_POST['password'] != $_POST['password_vetify'])
+            {
+                $data['password_err']=CONFIRM_PASSWORD;
             }
 
             if (empty($_FILES["avatar"]["name"])) {
@@ -87,11 +94,16 @@ class UserController extends BaseController
             if (empty($_POST['email'])) {
                 $err['email_err'] = ERROR_EMAIl;
             }
+
             $email = !empty($err['email_err']) ? $data['email'] : $_POST['email'];
             if (empty($_POST['password'])) {
                 $err['password_err'] = ERROR_PASSWORD_ONE;
             }
             $password = !empty($err['password_err']) ? $data['password'] : $_POST['password'];
+            if ($_POST['password'] != $_POST['password_vetify'])
+            {
+                $data['password_err']=CONFIRM_PASSWORD;
+            }
             $avatar = $_FILES['avatar']['name'];
             $status = $_POST['status'];
             $arr = array(
@@ -136,6 +148,9 @@ class UserController extends BaseController
             //validate
             if (empty($_POST['email'])) {
                 $data['email_err'] = ERROR_EMAIl;
+            }
+            else if ($this->adminModel->is_email($_POST['email'])){
+                $data['email_err'] = ERROR_INVALID_EMAIl;
             }
             if (empty($_POST['password'])) {
                 $data['password_err'] = ERROR_PASSWORD_ONE;
