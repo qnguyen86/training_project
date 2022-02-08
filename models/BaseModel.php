@@ -59,6 +59,4 @@ abstract class BaseModel implements DBInterface
         return (preg_match("/^[a-zA-z]*$/", $name)) ? FALSE : TRUE;
     }
 
-
-
 }
