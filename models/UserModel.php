@@ -1,6 +1,6 @@
 <?php
 require_once('models/BaseModel.php');
-require_once('component/ValidationComponent.php');
+require_once('component/Config.php');
 
 class UserModel extends BaseModel
 {
@@ -11,24 +11,22 @@ class UserModel extends BaseModel
         $this->db = DB::getInstance();
         $this->tableName = "users";
     }
-    public function modelRead($recordPerPage)
+    public function readRecord($recordPerPage)
     {
         $page = isset($_GET["page"]) && $_GET["page"] > 0 ? $_GET["page"] - 1 : 0;
         $from = $page * $recordPerPage;
         $conn = DB::getInstance();
-        $query = $conn->query("select * from users where del_flag='0' order by id desc limit $from, $recordPerPage");
+        $query = $this->db->query("select id, name, avatar, email,status from {$this->tableName} where del_flag= '0'  order by id desc limit $from, $recordPerPage   ");
         return $query->fetchAll();
     }
 
-    public function modelTotalRecord()
+    public function totalRecord()
     {
-        $conn = DB::getInstance();
-        $query = $conn->query("select id from users");
-        return $query->rowCount();
+        return $this->db->query("SELECT id FROM `{$this->tableName}` WHERE del_flag= ".ACTIVE)->rowCount();
     }
-    public function modelGetID($id)
+    public function getID($id)
     {
-        return $this->db->query("SELECT * FROM `{$this->tableName}` WHERE `id` = '{$id}' ")->fetch();
+        return $this->db->query("SELECT id, name, avatar, email,status FROM `{$this->tableName}` WHERE `id` = '{$id}' ")->fetch();
 
     }
     public function login($email, $password)
