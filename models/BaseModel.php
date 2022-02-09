@@ -11,7 +11,7 @@ abstract class BaseModel implements DBInterface
 
     public function insert($data = [])
     {
-        $ins = ['ins_id' => 0, 'ins_datetime' => date("y-m-d H:i:s "),];
+        $ins = ['ins_id' => $_SESSION['admin']['login']['id'], 'ins_datetime' => date("y-m-d H:i:s "),];
         $data = array_merge($data, $ins);
         $fields = "";
         $values = "";
@@ -28,7 +28,7 @@ abstract class BaseModel implements DBInterface
 
     public function update($data = [], $condition = "")
     {
-        $upd = ['upd_id' => 0, 'upd_datetime' => date("Y-m-d H:i:s "),];
+        $upd = ['upd_id' => $_SESSION['admin']['login']['id'], 'upd_datetime' => date("Y-m-d H:i:s "),];
         $data = array_merge($data, $upd);
         $sql = "";
         foreach ($data as $field => $value) {
