@@ -1,0 +1,17 @@
+RewriteEngine On
+
+RewriteRule ^admin/login$   index.php?controller=admin&action=login
+RewriteRule ^admin/logout$    index.php?controller=admin&action=logout
+RewriteRule ^admin/create$   index.php?controller=admin&action=create
+RewriteRule ^admin/update/(.*)$   index.php?controller=admin&action=update&id=$1
+RewriteRule ^admin/delete/(.*)$   index.php?controller=admin&action=delete&id=$1
+RewriteRule ^admin/search$   index.php?controller=admin&action=search
+
+RewriteRule ^user/login$   index.php?controller=user&action=login
+RewriteRule ^user/logout$    index.php?controller=user&action=logout
+RewriteRule ^user/create$   index.php?controller=user&action=create
+RewriteRule ^user/update/(.*)$   index.php?controller=user&action=update&id=$1
+RewriteRule ^user/delete/(.*)$   index.php?controller=user&action=delete&id=$1
+RewriteRule ^user/search$   index.php?controller=user&action=search
+
+
