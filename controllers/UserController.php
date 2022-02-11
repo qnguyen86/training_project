@@ -1,7 +1,7 @@
 <?php
 require_once('controllers/BaseController.php');
 require_once('models/UserModel.php');
-include_once('component/ValidationComponent.php');
+require_once ('component/Config.php');
 include_once('component/Message.php');
 
 class UserController extends BaseController
@@ -22,10 +22,9 @@ class UserController extends BaseController
 
     public function index()
     {
-        $recordPerPage = 2;
-
-        $numPage = ceil($this->userModel->modelTotalRecord() / $recordPerPage);
-        $data = $this->userModel->modelRead($recordPerPage);
+        $recordPerPage=RECORD_PER_PAGE;
+        $numPage = ceil($this->userModel->totalRecord() / $recordPerPage);
+        $data = $this->userModel->readRecord($recordPerPage);
         $this->render('index', array("data" => $data, "numPage" => $numPage));
     }
 
@@ -33,31 +32,16 @@ class UserController extends BaseController
 
     public function create()
     {
-        $data = [];
+        $error = [];
         if (isset($_POST['save'])) {
-            if (empty($_POST['name'])) {
-                $data['name_err'] = ERROR_NAME;
-            }
-            else if ($this->adminModel->is_name($_POST['name'])){
-                $data['name_err'] = ERROR_INVALID_NAME;
-            }
-            if (empty($_POST['email'])) {
-                $data['email_err'] = ERROR_EMAIl;
-            }
-            if (empty($_POST['password'])) {
-                $data['password_err'] = ERROR_PASSWORD_ONE;
-            }
-            if ($_POST['password'] != $_POST['password_vetify'])
-            {
-                $data['password_err']=CONFIRM_PASSWORD;
-            }
+            $post=array_merge($_POST['save'],['avatar' => $_FILES['avatar']['name']]);
+            $error=UserValidate::validCreate($post);
 
-            if (empty($_FILES["avatar"]["name"])) {
-                $data['avatar_err'] = ERROR_AVATAR;
-            }
             empty($_POST["status"]);
 
             if (empty($data)) {
+                $arr=$post;
+                $arr['password']=md5($post['password']);
                 $uploadFile = 'assets/upload/user/'.$_FILES["avatar"]["name"];
                 $arr = array(
                     'avatar' => $_FILES["avatar"]["name"],
@@ -78,49 +62,34 @@ class UserController extends BaseController
 
         }
 
-        $this->render('create', $data);
+        $this->render('create', $error);
 
     }
     function update()
     {
         $id = $_GET['id'];
-        $data = $this->userModel->modelGetID($id);
-        $err = [];
+        $data = $this->userModel->getID($id);
+        $error = [];
         if (isset($_POST['save'])) {
-            if (empty($_POST['name'])) {
-                $err['name_err'] = ERROR_NAME;
-            }
-            $name = !empty($err['name_err']) ? $data['name'] : $_POST['name'];
-            if (empty($_POST['email'])) {
-                $err['email_err'] = ERROR_EMAIl;
-            }
-
-            $email = !empty($err['email_err']) ? $data['email'] : $_POST['email'];
-            if (empty($_POST['password'])) {
-                $err['password_err'] = ERROR_PASSWORD_ONE;
-            }
-            $password = !empty($err['password_err']) ? $data['password'] : $_POST['password'];
-            if ($_POST['password'] != $_POST['password_vetify'])
-            {
-                $data['password_err']=CONFIRM_PASSWORD;
-            }
-            $avatar = $_FILES['avatar']['name'];
+            $post=array_merge($_POST['save'],['avatar' => $_FILES['avatar']['name']]);
+            $arr=UserValidate::validateUpdate($data,$post);
+            extract($arr);
             $status = $_POST['status'];
-            $arr = array(
-                'avatar' => $avatar,
-                'name' => $name,
-                'email' => $email,
-                'password' => $password,
-                'status' => $status,
+            $dataUp = array(
+                'avatar' => $data['avatar'],
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'password' => $data['password'],
+                'status' => $data['status'],
             );
             $upload_file = 'assets/upload/user/' . $_FILES['avatar']['name'];
-            if ($this->userModel->update($arr, "`id` = '{$id}'")) {
+            if ($this->userModel->update($dataUp, "`id` = '{$id}'")) {
                 move_uploaded_file($_FILES['avatar']['tmp_name'], $upload_file);
                 $data['alert-success'] = UPDATE_PASS;
             }
         }
         $mag = array(
-            'error' => $err,
+            'error' => $error,
             'data' => $data,
         );
         $this->render('update', $mag);
@@ -136,9 +105,9 @@ class UserController extends BaseController
     }
     public function login()
     {
+        $data=[];
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             // process form
-            session_start();
             $data = [
                 'email' => $_POST['email'],
                 'password' => $_POST['password'],
@@ -167,12 +136,6 @@ class UserController extends BaseController
 
         } else {
 
-            // init data
-            $data = [
-                'email' => '',
-                'password' => '',
-
-            ];
             //load view
             $this->render('login', $data);
         }
