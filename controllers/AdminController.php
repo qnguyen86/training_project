@@ -1,18 +1,19 @@
 <?php
 require_once('controllers/BaseController.php');
 require_once('models/AdminModel.php');
-include_once('component/ValidationComponent.php');
+require_once ('component/Config.php');
 include_once('component/Message.php');
+require_once ('Validate/AdminValidate.php');
 
 class AdminController extends BaseController
 {
     public $adminModel;
 
-
     public function __construct()
     {
         $this->folder = 'admin';
         $this->adminModel = new AdminModel();
+        $this->adminvad = new AdminValidate();
     }
 
     public function error()
@@ -22,17 +23,16 @@ class AdminController extends BaseController
 
     public function index()
     {
-        $recordPerPage = 3;
-        $numPage = ceil($this->adminModel->modelTotalRecord() / $recordPerPage);
-        $data = $this->adminModel->modelRead($recordPerPage);
+        $recordPerPage=RECORD_PER_PAGE;
+        $numPage = ceil($this->adminModel->totalRecord() / $recordPerPage);
+        $data = $this->adminModel->readRecord($recordPerPage);
         $this->render('index', array("data" => $data,"numPage" => $numPage));
     }
 
     public function login()
     {
+      $data=[];
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            // process form
-            session_start();
             $data = [
                 'email' => $_POST['email'],
                 'password' => $_POST['password'],
@@ -61,13 +61,6 @@ class AdminController extends BaseController
             }
 
         } else {
-
-            // init data
-            $data = [
-                'email' => '',
-                'password' => '',
-
-            ];
             //load view
             $this->render('login', $data);
         }
@@ -81,34 +74,15 @@ class AdminController extends BaseController
 
     public function create()
     {
-        $data = [];
+        $error = [];
         if (isset($_POST['save'])) {
-            if (empty($_POST['name'])) {
-                $data['name_err'] = ERROR_NAME;
-            }
-            else if ($this->adminModel->is_name($_POST['name'])){
-                $data['name_err'] = ERROR_INVALID_NAME;
-            }
-            if (empty($_POST['email'])) {
-                $data['email_err'] = ERROR_EMAIl;
-            }
-            else if ($this->adminModel->findEmail($_POST['email'])){
-                $data['email_err'] = ERROR_NOT_EMAIl;
-            }
-            if (empty($_POST['password'])) {
-                $data['password_err'] = ERROR_PASSWORD_ONE;
-            }
-            if ($_POST['password'] != $_POST['password_vetify'] )
-            {
-                $data['password_err']=CONFIRM_PASSWORD;
-            }
-
-            if (empty($_FILES["avatar"]["name"])) {
-                $data['avatar_err'] = ERROR_AVATAR;
-            }
+            $post=array_merge($_POST['save'],['avatar' => $_FILES['avatar']['name']]);
+            $error=$this->adminvad->validCreate($post);
             empty($_POST["role_type"]);
 
-            if (empty($data)) {
+            if (empty($error)) {
+                $arr=$post;
+                $arr['password']=md5($post['password']);
                 $uploadFile = 'assets/upload/admin/' . $_FILES["avatar"]["name"];
                 $arr = array(
                     'avatar' => $_FILES["avatar"]["name"],
@@ -121,53 +95,44 @@ class AdminController extends BaseController
                 if ($this->adminModel->insert($arr)) {
                     move_uploaded_file($_FILES["avatar"]["tmp_name"], $uploadFile);
                     $_SESSION['admin']['upload'] = $uploadFile;
-                    $data['alert-success'] = INSERT_PASS;
+                    $error['alert-success'] = INSERT_PASS;
                 }
             } else {
-                $data['alert-fail'] = INSERT_FAIL;
+                $error['alert-fail'] = INSERT_FAIL;
             }
 
         }
 
-        $this->render('create', $data);
+        $this->render('create', $error);
 
     }
 
     function update()
     {
         $id = $_GET['id'];
-        $data = $this->adminModel->modelGetID($id);
-        $err = [];
+        $data = $this->adminModel->getID($id);
+        $error = [];
         if (isset($_POST['save'])) {
-            if (empty($_POST['name'])) {
-                $err['name_err'] = ERROR_NAME;
-            }
-            $name = !empty($err['name_err']) ? $data['name'] : $_POST['name'];
-            if (empty($_POST['email'])) {
-                $err['email_err'] = ERROR_EMAIl;
-            }
-            $email = !empty($err['email_err']) ? $data['email'] : $_POST['email'];
-            if (empty($_POST['password'])) {
-                $err['password_err'] = ERROR_PASSWORD_ONE;
-            }
-            $password = !empty($err['password_err']) ? $data['password'] : $_POST['password'];
-            $avatar = $_FILES['avatar']['name'];
+            $post=array_merge($_POST['save'],['avatar' => $_FILES['avatar']['name']]);
+            $arr=AdminValidate::validateUpdate($data,$post);
+            extract($arr);
+
             $role_type = $_POST['role_type'];
-            $arr = array(
-                'avatar' => $avatar,
-                'name' => $name,
-                'email' => $email,
-                'password' => $password,
-                'role_type' => $role_type,
+            $dataUp = array(
+                'avatar' => $data['avatar'],
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'password' => $data['password'],
+                'role_type' => $data['role_type'],
             );
             $upload_file = 'assets/upload/admin/' . $_FILES['avatar']['name'];
-            if ($this->adminModel->update($arr, "`id` = '{$id}'")) {
+            if ($this->adminModel->update($dataUp, "`id` = '{$id}'")) {
                 move_uploaded_file($_FILES['avatar']['tmp_name'], $upload_file);
                 $data['alert-success'] = UPDATE_PASS;
             }
         }
         $mag = array(
-            'error' => $err,
+            'error' => $error,
             'data' => $data,
         );
         $this->render('update', $mag);
@@ -178,8 +143,24 @@ class AdminController extends BaseController
             header("Location: index.php?controller=admin&action=index");
         }
     }
-    function search(){
-        $this->render('search');
+    function search()
+    {
+        $data = [];
+        if (isset($_POST['search'])) {
+            if (empty($_POST['name'])) {
+                $data['name_err'] = ERROR_NAME;
+            } else if ($this->adminModel->is_name($_POST['name'])) {
+                $data['name_err'] = ERROR_INVALID_NAME;
+            }
+            if (empty($_POST['email'])) {
+                $data['email_err'] = ERROR_EMAIl;
+            }
+            if ($this->adminModel->searchInfor()) {
+                header("Location: index.php?controller=admin&action=index");
+            }
+
+        }
+        $this->render('search', $data);
     }
 
 }
